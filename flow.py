@@ -30,10 +30,11 @@ class IntersectingPolygons:
 
     def recursion(self, candidate_sequence):
         for x in self.generator.generate_candidate_step(candidate_sequence):
-            if self.end_condition(x):
-                print(f"theoretically met end condition {x}")
-            elif not self.filter_candidate_step(x):
-                self.recursion(x)
+            if not self.filter_candidate_step(x):
+                if self.end_condition(x):
+                    print(f"theoretically met end condition {x}")
+                else:
+                    self.recursion(x)
             else:
                 #print(f"filtered out {x}")
                 pass

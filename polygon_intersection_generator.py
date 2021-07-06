@@ -13,27 +13,34 @@ class PolygonIntersectionGenerator:
         for candidate in self.generate_full_size_steps(candidate_sequence):
             yield candidate
         if candidate_sequence:
-            # I think initial step can always be full sized step
-            for candidate in self.generate_step_missing_two_edges(candidate_sequence):
+            # I think initial step can always be full sized step. TODO - verify
+            for candidate in self.generate_step_missing_k_edges(2, candidate_sequence):
                 yield candidate
-            for candidate in self.generate_step_missing_three_edges(candidate_sequence):
+            for candidate in self.generate_step_missing_k_edges(3, candidate_sequence):
                 yield candidate
 
-    def generate_step_missing_two_edges(self, candidate_sequence):
-        # TODO implement
-        dummy_steps = [[5, 1, 2], [2, 3, 4]]
-        for candidate in dummy_steps:
-            c = candidate_sequence[:]
-            c.append(candidate)
-            yield c
-
-    def generate_step_missing_three_edges(self, candidate_sequence):
-        # TODO implement
-        dummy_steps = [[5, 1], [3, 4]]
-        for candidate in dummy_steps:
-            c = candidate_sequence[:]
-            c.append(candidate)
-            yield c
+    def generate_step_missing_k_edges(self, k, candidate_sequence):
+        edge_count = self.n - k
+        #   select n - k edges to include
+        for new_edges in itertools.combinations(self.edges(), edge_count):
+            #   find intersection of that set of edges with edges from previous step in sequence
+            #   order intersection by ordering in previous step
+            previous_step = candidate_sequence[-1]
+            ordered_edges = [e for e in previous_step if e in new_edges]
+            #   randomly place remaining edges (possibly subject to pre-filtering criteria)
+            remaining_edges = [e for e in new_edges if e not in ordered_edges]
+            for placement_permutation in itertools.permutations(range(edge_count), len(remaining_edges)):
+                candidate = [-1]*(edge_count) # initialize candidate to correct length
+                for i in range(len(remaining_edges)):
+                    candidate[placement_permutation[i]] = remaining_edges[i]
+                next_edge_ix = 0
+                for i, e in enumerate(candidate):
+                    if e == -1:
+                        candidate[i] = ordered_edges[next_edge_ix]
+                        next_edge_ix += 1
+                c = candidate_sequence[:]
+                c.append(candidate)
+                yield c
 
     def generate_full_size_steps(self, candidate_sequence):
         """
