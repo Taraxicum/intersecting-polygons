@@ -81,7 +81,10 @@ class MaxFullLengthStepFilter(IntersectionSequenceFilter):
     a sequence should never have more than three consecutive n-1 length steps
     """
     def apply_filter(candidate_sequence):
-        # TODO implement
+        # TODO test me!
+        if len(candidate_sequence)>2:
+            if all([len(candidate_sequence[-(i+1)])==IntersectionSequenceFilter.n-1 for i in range(3)]):
+                return True
         return False
 
 class OddLengthStepFilter(IntersectionSequenceFilter):
