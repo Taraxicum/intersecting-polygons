@@ -32,8 +32,6 @@ def test_max_full_length_step_filter():
     assert not f.apply_filter([[]])
     assert not f.apply_filter([[1, 2, 3, 4]])
     assert not f.apply_filter([[1, 2, 3, 4], [1, 2, 3, 4]])
-    # TODO the assertion below is currently failing because it is treating three as unallowed
-    #   I think three is supposed to be allowed, but not four, want to verify before adjusting
     assert not f.apply_filter([[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]) 
     assert f.apply_filter([[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]])
     assert not f.apply_filter([[1, 2, 3, 4], [1, 2, 3, 4], [2, 3], [1, 2, 3, 4], [1, 2, 3, 4]])
