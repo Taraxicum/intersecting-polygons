@@ -60,6 +60,8 @@ class PolygonIntersectionGenerator:
                 if new_missing_edge == 0:
                     new_missing_edge = self.n
                 # maintained edges must retain ordering
+                # TODO based on my reading of the paper, it seems like the ordering could also be
+                #   reversed - is that true? If so this needs to be updated.
                 new_step = [x for x in last_step if x != new_missing_edge]
                 for i in range(len(new_step) + 1):
                     step = new_step[:i] + [missing_edge] + new_step[i:]
