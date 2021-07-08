@@ -5,8 +5,11 @@ class IntersectingPolygons:
     # TODO ultimately n should probably be a parameter that gets passed in to initializer rather
     #   than being hardcoded here
     n = 5
+    steps_count = 0
     def __init__(self, filters):
-        self.filters = filters
+        self.filters = []
+        for f in filters:
+            self.filters.append(f(self.n))
         self.generator = PolygonIntersectionGenerator(IntersectingPolygons.n)
 
     def filter_candidate_step(self, candidate_sequence):
@@ -29,6 +32,8 @@ class IntersectingPolygons:
         return False
 
     def recursion(self, candidate_sequence):
+        self.steps_count += 1
+        if self.steps_count %1000 == 0: print(f"Step count {self.steps_count}, sequence {candidate_sequence}")
         for x in self.generator.generate_candidate_step(candidate_sequence):
             if not self.filter_candidate_step(x):
                 if self.end_condition(x):

@@ -6,15 +6,16 @@ from abc import ABC, abstractmethod
 #    IntersectingPolygons class
 
 class IntersectionSequenceFilter(ABC):
-    n = 5
+    def __init__(self, n):
+        self.n = n
 
     @abstractmethod
-    def apply_filter(candidate_sequence):
+    def apply_filter(self, candidate_sequence):
         pass
 
 class DummyFilter(IntersectionSequenceFilter):
     # this is just a dummy filter for testing, filters on sequence length
-    def apply_filter(candidate_sequence):
+    def apply_filter(self, candidate_sequence):
         if len(candidate_sequence) > 3:
             #print(f"Filtered on dummy filter {candidate_sequence}")
             return True
@@ -23,7 +24,7 @@ class ParityFilter(IntersectionSequenceFilter):
     """
         relative parity must match positional parity
     """
-    def apply_filter(candidate_sequence):
+    def apply_filter(self, candidate_sequence):
         """Returns True if step should be filtered out, returns False otherwise
         """
         return False
@@ -32,7 +33,7 @@ class Lemma1Filter(IntersectionSequenceFilter):
     """
     filter on lemma 1 from paper (probably should update this description along with implementing)
     """
-    def apply_filter(candidate_sequence):
+    def apply_filter(self, candidate_sequence):
         """Returns True if step should be filtered out, returns False otherwise
         """
         # TODO implement
@@ -45,7 +46,7 @@ class OrderingFilter(IntersectionSequenceFilter):
           [0, 1, 3, 5], [1, 4, 3, 5] is valid under this rule
           [0, 1, 3, 5], [3, 4, 1, 5] is not valid under this rule
     """
-    def apply_filter(candidate_sequence):
+    def apply_filter(self, candidate_sequence):
         if len(candidate_sequence) > 1:
             last_step = candidate_sequence[-1]
             second_to_last_step = candidate_sequence[-2]
@@ -66,7 +67,7 @@ class RepeatedStepFilter(IntersectionSequenceFilter):
     We'll assume that only the last step in the sequence might introduce a repeat
         i.e. assume the previous steps have already been validated
     """
-    def apply_filter(candidate_sequence):
+    def apply_filter(self, candidate_sequence):
         if len(candidate_sequence) > 1:
             last_step = candidate_sequence[-1]
             for step in candidate_sequence[:-1]:
@@ -80,7 +81,7 @@ class MaxFullLengthStepFilter(IntersectionSequenceFilter):
     """
     a sequence should never have more than three consecutive n-1 length steps
     """
-    def apply_filter(candidate_sequence):
+    def apply_filter(self, candidate_sequence):
         if len(candidate_sequence)>3:
             if all([len(candidate_sequence[-(i+1)])==IntersectionSequenceFilter.n-1 for i in range(4)]):
                 return True
@@ -90,7 +91,7 @@ class OddLengthStepFilter(IntersectionSequenceFilter):
     """
     an odd length step should be a trunction of a valid even length step
     """
-    def apply_filter(candidate_sequence):
+    def apply_filter(self, candidate_sequence):
         # TODO implement
         return False
 
@@ -100,7 +101,15 @@ class HappyPathFilter(IntersectionSequenceFilter):
     in particular if the maximum free edges have already been used we can stop the sequence
     """
     # TODO probably could have a better name for this filter
-    def apply_filter(candidate_sequence):
-        # TODO implement
+    def __init__(self, n):
+        self.n = n
+        # can have this fewer than this many intersections under full accumulated in a sequence and still
+        #  potentially reach a contradictory example
+        self.max_freedoms = self.n - 3 
+
+    def apply_filter(self, candidate_sequence):
+        if sum([(self.n - 1) - len(step) for step in candidate_sequence]) >= self.max_freedoms:
+            #print(f"filtered for happy path {candidate_sequence}")
+            return True
         return False
 
