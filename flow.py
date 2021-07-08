@@ -34,7 +34,9 @@ class IntersectingPolygons:
     def recursion(self, candidate_sequence):
         self.steps_count += 1
         if self.steps_count %1000 == 0: print(f"Step count {self.steps_count}, sequence {candidate_sequence}")
-        for x in self.generator.generate_candidate_step(candidate_sequence):
+        if self.steps_count > 10000: return
+        new_candidate_sequence = self.generator.generate_candidate_step(candidate_sequence)
+        for x in new_candidate_sequence:
             if not self.filter_candidate_step(x):
                 if self.end_condition(x):
                     print(f"theoretically met end condition {x}")
@@ -45,7 +47,7 @@ class IntersectingPolygons:
                 pass
 
 instance = IntersectingPolygons([
-    DummyFilter,
+    #DummyFilter,
     ParityFilter,
     Lemma1Filter,
     OrderingFilter,

@@ -46,6 +46,7 @@ class OrderingFilter(IntersectionSequenceFilter):
           [0, 1, 3, 5], [1, 4, 3, 5] is valid under this rule
           [0, 1, 3, 5], [3, 4, 1, 5] is not valid under this rule
     """
+    #TODO this is probably better to enforce in the generation stage rather than the filtering stage
     def apply_filter(self, candidate_sequence):
         if len(candidate_sequence) > 1:
             last_step = candidate_sequence[-1]
@@ -83,7 +84,7 @@ class MaxFullLengthStepFilter(IntersectionSequenceFilter):
     """
     def apply_filter(self, candidate_sequence):
         if len(candidate_sequence)>3:
-            if all([len(candidate_sequence[-(i+1)])==IntersectionSequenceFilter.n-1 for i in range(4)]):
+            if all([len(candidate_sequence[-(i+1)])==self.n-1 for i in range(4)]):
                 return True
         return False
 
