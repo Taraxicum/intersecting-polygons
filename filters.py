@@ -23,6 +23,15 @@ class DummyFilter(IntersectionSequenceFilter):
 class ParityFilter(IntersectionSequenceFilter):
     """
         relative parity must match positional parity
+        the parity filter only applies to connected chains of edges
+        ex:
+        if you hit edges 1,2,3,5,6,7 of a 9-gon then the parity filter 
+          could apply to each of the two chains {1,2,3} and {5,6,7} of the 9-gon.
+        In particular it would disallow  [1,3,2,5,6,7] since 1 and 3 can't be
+          adjacent since they have equal relative parity (so they can't have opposite
+          positional parity)
+        Note we do need to pay attention to wrapping around (e.g. in a 9-gon {8, 9, 1} 
+          would be a connected chain of edges - that would be allowed in that order)
     """
     def apply_filter(self, candidate_sequence):
         """Returns True if step should be filtered out, returns False otherwise
