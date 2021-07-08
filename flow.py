@@ -50,7 +50,7 @@ instance = IntersectingPolygons([
     #DummyFilter,
     ParityFilter,
     Lemma1Filter,
-    OrderingFilter,
+    #OrderingFilter, # This should be enforced during step generation so shouldn't need to filter on it
     MaxFullLengthStepFilter,
     RepeatedStepFilter,
     OddLengthStepFilter,

@@ -66,7 +66,7 @@ class OrderingFilter(IntersectionSequenceFilter):
                 if edge in last_step:
                     index = last_step.index(edge)
                     if index < max_index:
-                        #print(f"filtered on ordering {candidate_sequence}")
+                        print(f"filtered on ordering {candidate_sequence}")
                         return True
                     max_index = index
         return False
