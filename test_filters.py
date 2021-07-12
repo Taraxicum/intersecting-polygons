@@ -48,7 +48,20 @@ def test_happy_path_filter():
     assert not f.apply_filter([[1, 2, 3, 4], [2, 3, 4], [1, 2, 3, 5]])
     assert f.apply_filter([[1, 2, 3, 4], [2, 3, 4], [1, 2, 3, 5], [4, 3, 5]])
 
+def test_Lemma_1_filter():
+    print("testing Lemma 1 filter")
+    f = Lemma1Filter
+    assert not f.apply_filter([])
+    assert not f.apply_filter([[]])
+    assert not f.apply_filter([[1, 2, 3, 4]])
+    assert not f.apply_filter([[1, 2, 3, 4], [1, 2, 3, 4]])
+    assert not f.apply_filter([[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]]) 
+    assert f.apply_filter([[1,2,3,4,5,6,7,8],[9,2,3,4,5,6,7,8],[1,4,3,2,5,8,7,6]])
+    assert not f.apply_filter([[1,2,3,4,5,6,7,8],[9,2,3,4,5,6,7,8],[8,7,6,1,5,2,4,3]])
+    assert not f.apply_filter([[1, 2, 3, 4], [1, 2, 3, 4], [2, 3], [1, 2, 3, 4], [1, 2, 3, 4]])
+
 test_ordering_filter()
 test_repeated_step_filter()
 test_max_full_length_step_filter()
 test_happy_path_filter()
+test_Lemma_1_filter()

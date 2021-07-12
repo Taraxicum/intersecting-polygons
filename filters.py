@@ -42,11 +42,54 @@ class Lemma1Filter(IntersectionSequenceFilter):
     """
     filter on lemma 1 from paper (probably should update this description along with implementing)
     """
-    def apply_filter(self, candidate_sequence):
+    def apply_filter(candidate_sequence):
         """Returns True if step should be filtered out, returns False otherwise
         """
         # TODO implement
+        k=len(candidate_sequence)
+        if k>2:
+            last_step=candidate_sequence[-1]
+            for i in range(k-2):#If this is run in conjunction with OrderingFilter then we don't need to look at candidate_sequence[k-2] 
+                direction_changes=0
+                too_many_directions=False
+                step=candidate_sequence[i]
+                intersection=[edge for edge in step if edge in last_step]#first suppose that last_step points at step
+                #for edge in step:
+                #    if edge in last_step:
+                if last_step.index(intersection[1])>last_step.index(intersection[0]):
+                    direction=1
+                else:
+                    direction=0
+                for i in range(2,len(intersection)):#go through the edges on step, left-to-right, and check for direction changes on last_step
+                    if last_step.index(intersection[i])>last_step.index(intersection[i-1]):
+                        new_direction=1
+                    else:
+                        new_direction=0
+                    if new_direction!=direction:
+                        direction=new_direction
+                        direction_changes+=1
+                    if direction_changes>1:
+                        too_many_directions=True
+                        break
+                if too_many_directions:
+                    intersection=[edge for edge in last_step if edge in step]#now suppose that step points at last_step
+                    if step.index(intersection[1])>step.index(intersection[0]):
+                        direction=1#1 means right, 0 means left
+                    else: 
+                        direction=0
+                    for i in range(2,len(intersection)):
+                        if step.index(intersection[i])>step.index(intersection[i-1]):
+                            new_direction=1
+                        else:
+                            new_direction=0
+                        if new_direction!=direction:
+                            direction=new_direction
+                            direction_changes+=1
+                        if direction_changes>1:
+                            return True
+   
         return False
+
 
 class OrderingFilter(IntersectionSequenceFilter):
     """
