@@ -13,7 +13,7 @@ class PolygonIntersectionGenerator:
         for candidate in self.generate_full_size_steps(candidate_sequence):
             yield candidate
         if candidate_sequence:
-            # I think initial step can always be full sized step. TODO - verify
+            # The initial step can always be full sized step.
             for candidate in self.generate_step_missing_k_edges(2, candidate_sequence):
                 yield candidate
             for candidate in self.generate_step_missing_k_edges(3, candidate_sequence):
