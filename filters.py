@@ -42,7 +42,7 @@ class Lemma1Filter(IntersectionSequenceFilter):
     """
     filter on lemma 1 from paper (probably should update this description along with implementing)
     """
-    def apply_filter(candidate_sequence):
+    def apply_filter(self,candidate_sequence):
         """Returns True if step should be filtered out, returns False otherwise
         """
         # TODO implement
@@ -54,6 +54,8 @@ class Lemma1Filter(IntersectionSequenceFilter):
                 too_many_directions=False
                 step=candidate_sequence[i]
                 intersection=[edge for edge in step if edge in last_step]#first suppose that last_step points at step
+                if len(intersection)<4:
+                    break
                 #for edge in step:
                 #    if edge in last_step:
                 if last_step.index(intersection[1])>last_step.index(intersection[0]):
