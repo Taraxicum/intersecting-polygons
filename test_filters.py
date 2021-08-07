@@ -70,8 +70,8 @@ def test_parity_filter():
     assert not f.apply_filter([[1, 2, 3, 5, 6]])
     assert f.apply_filter([[1, 3, 2, 5, 6, 7]])
     assert f.apply_filter([[1, 2, 3, 5, 7, 6]])
-    assert not f.apply_filter([[8, 9, 1]])
-    assert f.apply_filter([[8, 9, 2, 1]])
+    assert not f.apply_filter([[8, 9, 1]]), "should allow valid parity wrt wrapping"
+    assert f.apply_filter([[8, 9, 2, 1]]), "should filter invalid parity wrt wrapping" # not currently implemented so this test is failing
 
 [[1, 2, 3, 4], [5, 2, 3, 4], [2, 3, 4], [2, 1, 5, 4], [3, 2, 1, 5], [4, 3, 2, 1]]
 
