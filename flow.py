@@ -4,7 +4,7 @@ from polygon_intersection_generator import PolygonIntersectionGenerator
 class IntersectingPolygons:
     # TODO ultimately n should probably be a parameter that gets passed in to initializer rather
     #   than being hardcoded here
-    n = 5
+    n = 7
     steps_count = 0
     def __init__(self, filters):
         self.filters = []
@@ -33,8 +33,8 @@ class IntersectingPolygons:
 
     def recursion(self, candidate_sequence):
         self.steps_count += 1
-        if self.steps_count %1000 == 0: print(f"Step count {self.steps_count}, sequence {candidate_sequence}")
-        if self.steps_count > 10000: return
+        if self.steps_count %100000 == 0: print(f"Step count {self.steps_count}, sequence {candidate_sequence}", flush=True)
+        #if self.steps_count > 100000: return
         new_candidate_sequence = self.generator.generate_candidate_step(candidate_sequence)
         for x in new_candidate_sequence:
             if not self.filter_candidate_step(x):
@@ -47,7 +47,6 @@ class IntersectingPolygons:
                 pass
 
 instance = IntersectingPolygons([
-    #DummyFilter,
     ParityFilter,
     Lemma1Filter,
     #OrderingFilter, # This should be enforced during step generation so shouldn't need to filter on it

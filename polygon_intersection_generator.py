@@ -9,9 +9,13 @@ class PolygonIntersectionGenerator:
 
     def generate_candidate_step(self, candidate_sequence):
         # yield candidate sequence with new element at end
-        # TODO should generalize this better
-        for candidate in self.generate_full_size_steps(candidate_sequence):
-            yield candidate
+        # TODO should generalize this better, in particular for larger n will need to
+        #  generate steps that may be missing more than 3 edges
+        if not candidate_sequence or self.is_outside_polygon(candidate_sequence):
+            # a sequence that is currently inside the polygon cannot have the next step
+            # be full sized
+            for candidate in self.generate_full_size_steps(candidate_sequence):
+                yield candidate
         if candidate_sequence:
             # The initial step can always be full sized step.
             for candidate in self.generate_step_missing_k_edges(2, candidate_sequence):
@@ -19,10 +23,17 @@ class PolygonIntersectionGenerator:
             for candidate in self.generate_step_missing_k_edges(3, candidate_sequence):
                 yield candidate
 
+    def is_outside_polygon(self, candidate_sequence):
+        """
+        A sequence will always start outside of the polygon, any step with an odd number
+          of intersections will be inside the polygon.
+        """
+        return sum([len(step) for step in candidate_sequence])%2 == 0
+
     def generate_step_missing_k_edges(self, k, candidate_sequence):
         """
         Generates candidate steps with n-k itersections
-        enforces ordering relative to previous step
+        Preserves ordering relative to previous step
         """
         edge_count = self.n - k
         #   select n - k edges to include
@@ -69,15 +80,11 @@ class PolygonIntersectionGenerator:
         # Should also be able to use the previous step to generate fewer candidates
         for step in self.generate_step_missing_k_edges(1, candidate_sequence):
             yield step
-        #for step in itertools.permutations(self.edges(), self.n - 1):
-        #    c = candidate_sequence[:]
-        #    c.append(step)
-        #    yield c
     
     def generate_full_size_step_from_full(self, candidate_sequence):            
         """
         Generates n-1 length candidate steps when previous step also had n-1 length
-        Preservers ordering of previous step
+        Preserves ordering of previous step
 
         This is special cased because if last step is missing a single edge,
           and the next step is also missing a single edge then can only be missing
@@ -101,6 +108,8 @@ class PolygonIntersectionGenerator:
     def generate_full_size_steps(self, candidate_sequence):
         """
         Generate candidate steps that is one smaller than the total number of edges
+        Successive steps preserve ordering of previous step
+
         """
         if candidate_sequence:
             last_step = candidate_sequence[-1]
