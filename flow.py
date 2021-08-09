@@ -2,21 +2,11 @@ from filters import *
 from polygon_intersection_generator import PolygonIntersectionGenerator
 
 class IntersectingPolygons:
-    # TODO ultimately n should probably be a parameter that gets passed in to initializer rather
-    #   than being hardcoded here
-    n = 7
     steps_count = 0
-    def __init__(self, filters):
-        self.filters = []
-        for f in filters:
-            self.filters.append(f(self.n))
-        self.generator = PolygonIntersectionGenerator(IntersectingPolygons.n)
-
-    def filter_candidate_step(self, candidate_sequence):
-        for f in self.filters:
-            if f.apply_filter(candidate_sequence):
-                return True
-        return False
+    def __init__(self, n, filter_manager):
+        self.n = n
+        self.filter_manager = filter_manager
+        self.generator = PolygonIntersectionGenerator(self.n)
 
     def end_condition(self, candidate_sequence):
         """
@@ -33,11 +23,11 @@ class IntersectingPolygons:
 
     def recursion(self, candidate_sequence):
         self.steps_count += 1
-        if self.steps_count %100000 == 0: print(f"Step count {self.steps_count}, sequence {candidate_sequence}", flush=True)
+        if self.steps_count %100000 == 0: print(f"Sequence count {self.steps_count}, sequence {candidate_sequence}", flush=True)
         #if self.steps_count > 100000: return
         new_candidate_sequence = self.generator.generate_candidate_step(candidate_sequence)
         for x in new_candidate_sequence:
-            if not self.filter_candidate_step(x):
+            if not self.filter_manager.filter_candidate_step(x):
                 if self.end_condition(x):
                     print(f"theoretically met end condition {x}")
                 else:
@@ -46,17 +36,15 @@ class IntersectingPolygons:
                 #print(f"filtered out {x}")
                 pass
 
-instance = IntersectingPolygons([
+
+n=5
+fm = FilterManager(n, [
     ParityFilter,
     Lemma1Filter,
-    #OrderingFilter, # This should be enforced during step generation so shouldn't need to filter on it
     MaxFullLengthStepFilter,
     RepeatedStepFilter,
     OddLengthStepFilter,
     HappyPathFilter,
     ])
+instance = IntersectingPolygons(n, fm)
 instance.recursion([])
-# when running this it's generating 4 initial options for 5 edges, I seem to remember only 2 are valid, but I'm not sure what the rule
-#   that eliminates two of them is (I think the two that contain edge 5 are the ones that shouldn't be included)
-
-

@@ -1,9 +1,19 @@
 from abc import ABC, abstractmethod
 
-# TODO implement filters, including ones not given a class here yet. Might make sense to organize 
-#    filters into a separate file at some point
 # Remember when defining new filters to add them to the list of filters when instantiating the
 #    IntersectingPolygons class
+class FilterManager:
+    def __init__(self, n, filters):
+        self.n = n
+        self.filters = []
+        for f in filters:
+            self.filters.append(f(self.n))
+    
+    def filter_candidate_step(self, candidate_sequence):
+        for f in self.filters:
+            if f.apply_filter(candidate_sequence):
+                return True
+        return False
 
 class IntersectionSequenceFilter(ABC):
     def __init__(self, n):
@@ -98,12 +108,11 @@ class ParityFilter(IntersectionSequenceFilter):
 
 class Lemma1Filter(IntersectionSequenceFilter):
     """
-    filter on lemma 1 from paper (probably should update this description along with implementing)
+    filter on lemma 1 from paper (TODO probably should update this description)
     """
     def apply_filter(self,candidate_sequence):
         """Returns True if step should be filtered out, returns False otherwise
         """
-        # TODO implement
         k=len(candidate_sequence)
         if k>2:
             last_step=candidate_sequence[-1]
@@ -158,7 +167,7 @@ class OrderingFilter(IntersectionSequenceFilter):
           [0, 1, 3, 5], [1, 4, 3, 5] is valid under this rule
           [0, 1, 3, 5], [3, 4, 1, 5] is not valid under this rule
     """
-    #TODO this is probably better to enforce in the generation stage rather than the filtering stage
+    #TODO clean up this code - this is now enforced in the generation stage rather than the filtering stage
     def apply_filter(self, candidate_sequence):
         if len(candidate_sequence) > 1:
             last_step = candidate_sequence[-1]
