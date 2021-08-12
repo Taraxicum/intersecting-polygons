@@ -18,10 +18,133 @@ class FilterManager:
 class IntersectionSequenceFilter(ABC):
     def __init__(self, n):
         self.n = n
+    def edges(self):#edges is a list 1,...,n of the edges of P
+        return [i + 1 for i in range(self.n)]
+
 
     @abstractmethod
     def apply_filter(self, candidate_sequence):
         pass
+
+class ParityFilterFullException(IntersectionSequenceFilter):
+    """
+        relative parity must match positional parity
+        the parity filter only applies to connected chains of edges
+        ex:
+        if you hit edges 1,2,3,5,6,7 of a 9-gon then the parity filter 
+          could apply to each of the two chains {1,2,3} and {5,6,7} of the 9-gon.
+        In particular it would disallow  [1,5,2,3,6,7] since 1 and 5 can't be
+          adjacent since they have the same relative parity (so they can't have opposite
+          positional parity)
+        Note we do need to pay attention to wrapping around (e.g. in a 9-gon {8, 9, 1} 
+          would be a connected chain of edges - which would be allowed in that order)
+    """
+    # TODO handle wrapping case
+    def apply_filter(self, candidate_sequence):
+        """
+        Returns True if step should be filtered out, returns False otherwise
+        Only filters on the last step, assumes previous steps have been previously filtered.
+        """
+        if len(candidate_sequence) < 1:
+            return False
+
+        last_step = candidate_sequence[-1]
+        if len(last_step)==(self.n-1):
+            missing_edges = set(self.edges()).difference(last_step)
+            missing_edge = missing_edges.pop()
+            normalized_last_step=[(x-missing_edge)%(self.n) for x in last_step]
+            return self.mismatched_parity(normalized_last_step)
+
+        partitions = self.partition_step(last_step)
+        return any([self.mismatched_parity(partition) for partition in partitions]) 
+
+    def mismatched_parity(self, partition):
+        """
+        return True if partition contains a mismatched relative/positional parity as described in class docstring
+          else returns False
+        """
+        for i in range(len(partition)-1):
+            if partition[i]%2 == partition[i+1]%2:
+                return True
+        return False
+
+    def partition_step(self, step):
+        """ returns a list of lists of contiguous partitions of the step
+            e.g.:
+                n=11, step is [3, 2, 1, 7, 5, 8, 11, 10, 9] should return [[3,2,1], [7], [5], [8, 11, 10, 9]]
+                n=13, step is [1, 2, 3, 4, 8, 5, 6, 11, 12, 7, 13] should return [[1,2,3,4], [8], [5,6], [11, 12], [7], [13]]
+
+                length(partition) => number of elements in the partition
+                height(partition) => 1 + max(partition) - min(partition)
+                a partition is happy if its length = height
+                
+                current_partition = []
+                - if adding next number to current_partition makes/keeps partition happy then add it without reservation
+                    - update max, min of current partition
+                - else candidate partition = current partition + next number
+                    - update max, min of candidate partition
+
+        """
+        partitions = []
+        current_partition = []
+        candidate_partition = []
+        ix = 0
+        finished_ix = 0
+        while ix < len(step):
+            val = step[ix]
+            candidate_partition.append(val)
+            if self.is_happy_partition(candidate_partition):
+                current_partition = candidate_partition
+                candidate_partition = current_partition[:]
+                finished_ix = ix
+            elif self.is_invalid_partition(candidate_partition, len(step) - (ix+1)):
+                partitions.append(current_partition)
+                current_partition = []
+                candidate_partition = []
+                ix = finished_ix
+            ix += 1
+        partitions.append(current_partition)
+        return partitions
+    
+    def is_happy_partition(self, partition):
+        height = 1 + max(partition) - min(partition)
+        return height == len(partition)
+
+    def is_invalid_partition(self, partition, remaining_length):
+        height = 1 + max(partition) - min(partition)
+        return len(partition) + remaining_length < height # can't complete partition in remaing space
+
+
+class SimpleParityFilter(IntersectionSequenceFilter):
+    """
+        relative parity must match positional parity
+        the parity filter only applies to connected chains of edges
+        ex:
+        if you hit edges 1,2,3,5,6,7 of a 9-gon then the parity filter 
+          could apply to each of the two chains {1,2,3} and {5,6,7} of the 9-gon.
+        In particular it would disallow  [1,5,2,3,6,7] since 1 and 5 can't be
+          adjacent since they have the same relative parity (so they can't have opposite
+          positional parity)
+        Note we do need to pay attention to wrapping around (e.g. in a 9-gon {8, 9, 1} 
+          would be a connected chain of edges - which would be allowed in that order)
+    """
+    # TODO handle wrapping case
+    def apply_filter(self, candidate_sequence):
+        """
+        Returns True if step should be filtered out, returns False otherwise
+        Only filters on the last step, assumes previous steps have been previously filtered.
+        """
+        if len(candidate_sequence) < 1:
+            print('too short')
+            return False
+        last_step = candidate_sequence[-1]
+        DLS=[x-1 for x in last_step]#DLS is short for "decremented last step"
+        for i in range(self.n):
+            if i in DLS and ((i+1)%(self.n)) in DLS:
+                if (DLS.index(i)-DLS.index((i+1)%(self.n)))%2==0:
+                    return True
+        return False
+
 
 class ParityFilter(IntersectionSequenceFilter):
     """
