@@ -1,13 +1,13 @@
 from filters import *
-from polygon_intersection_generator import PolygonIntersectionGenerator
+from polygon_intersection_generator import *
 
 class IntersectingPolygons:
     steps_count = 0
     def __init__(self, n, filter_manager):
         self.n = n
         self.filter_manager = filter_manager
-        self.generator = PolygonIntersectionGenerator(self.n)
-
+        #self.generator = PolygonIntersectionGenerator(self.n)
+        self.generator = PolygonIntersectionGeneratorRestricted(self.n)
     def end_condition(self, candidate_sequence):
         """
         We are looking for a sequence that has final step the reverse of the initial step
@@ -23,7 +23,7 @@ class IntersectingPolygons:
 
     def recursion(self, candidate_sequence):
         self.steps_count += 1
-        if self.steps_count %100000 == 0: print(f"Sequence count {self.steps_count}, sequence {candidate_sequence}", flush=True)
+        if self.steps_count %1000 == 0: print(f"Sequence count {self.steps_count}, sequence {candidate_sequence}", flush=True)
         #if self.steps_count > 100000: return
         new_candidate_sequence = self.generator.generate_candidate_step(candidate_sequence)
         for x in new_candidate_sequence:
@@ -37,9 +37,11 @@ class IntersectingPolygons:
                 pass
 
 
-n=5
+n=7
 fm = FilterManager(n, [
-    ParityFilter,
+    #ParityFilter,
+    #ParityFilterFullException,
+    SimpleParityFilter,
     Lemma1Filter,
     MaxFullLengthStepFilter,
     RepeatedStepFilter,
