@@ -39,9 +39,7 @@ class IntersectingPolygons:
 
 n=5
 fm = FilterManager(n, [
-    #ParityFilter,
-    #ParityFilterFullException,
-    SimpleParityFilter,
+    ParityFilter,
     Lemma1Filter,
     MaxFullLengthStepFilter,
     RepeatedStepFilter,
