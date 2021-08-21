@@ -48,10 +48,14 @@ class ParityFilter(IntersectionSequenceFilter):
         if len(candidate_sequence) < 1:
             return False
         last_step = candidate_sequence[-1]
-        DLS=[x-1 for x in last_step]#DLS is short for "decremented last step"
-        for i in range(self.n):
-            if i in DLS and ((i+1)%(self.n)) in DLS:
-                if (DLS.index(i)-DLS.index((i+1)%(self.n)))%2==0:
+        parities = dict()
+        for ix, val in enumerate(last_step):
+            parities[val] = ix%2
+
+        for i in last_step:
+            incremented = (i+1)%self.n or self.n # increments mod n, if 0 use n instead
+            if incremented in parities:
+                if parities[i] == parities[incremented]:
                     return True
         return False
 
