@@ -7,7 +7,7 @@ class IntersectingPolygons:
         self.n = n
         self.filter_manager = filter_manager
         #self.generator = PolygonIntersectionGenerator(self.n)
-        self.generator = PolygonIntersectionGeneratorRestricted(self.n)
+        self.generator = PolygonIntersectionGenerator(self.n)
     def end_condition(self, candidate_sequence):
         """
         We are looking for a sequence that has final step the reverse of the initial step
@@ -37,7 +37,7 @@ class IntersectingPolygons:
                 pass
 
 
-n=7
+n=5
 fm = FilterManager(n, [
     #ParityFilter,
     #ParityFilterFullException,
