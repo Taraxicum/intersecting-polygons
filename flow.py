@@ -28,7 +28,7 @@ class IntersectingPolygons:
         if self.steps_count %500000 == 0: 
             elapsed_time = time.time() - self.start_time
             print(f"Sequence count {self.steps_count}, time {elapsed_time:.1f}, sequence {candidate_sequence}", flush=True)
-        #if self.steps_count > 100000: return
+        #if self.steps_count > 500000: return
         new_candidate_sequence = self.generator.generate_candidate_step(candidate_sequence)
         for x in new_candidate_sequence:
             if not self.filter_manager.filter_candidate_step(x):
@@ -41,7 +41,8 @@ class IntersectingPolygons:
                 pass
 
 
-n=7
+n=9
+# currently 23.5million sequences before the 4th step has it's first change for n=9
 fm = FilterManager(n, [
     ParityFilter,
     Lemma1Filter,

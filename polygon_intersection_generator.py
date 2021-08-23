@@ -6,11 +6,10 @@ class PolygonIntersectionGenerator:
         assert n%2==1, f"n must be odd, got {n}"
         self.n = n# n is the number of edges of P
         
-        # TODO max_freedoms is also defined in filters, better if only be defined in one place
         # allowed freedoms is the total amount that steps are less than full sized and so potentially
         #   break the conjecture by having two polygons with greater than the proposed number of
         #   intersections
-        # this conjecture allows for n - 3 so we don't need to check those because they are allowed
+        # the conjecture allows for n - 3 so we don't need to check those because they are allowed
         #   we also don't need to consider n - 4 since that would not lead to a valid polygon since
         #   it would imply the sequence was currently inside the polygon but with no freedom to
         #   get back outside
