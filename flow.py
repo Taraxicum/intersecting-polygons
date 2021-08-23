@@ -7,7 +7,6 @@ class IntersectingPolygons:
     def __init__(self, n, filter_manager):
         self.n = n
         self.filter_manager = filter_manager
-        #self.generator = PolygonIntersectionGenerator(self.n)
         self.generator = PolygonIntersectionGenerator(self.n)
         self.start_time = time.time()
     
@@ -29,7 +28,7 @@ class IntersectingPolygons:
         if self.steps_count %500000 == 0: 
             elapsed_time = time.time() - self.start_time
             print(f"Sequence count {self.steps_count}, time {elapsed_time:.1f}, sequence {candidate_sequence}", flush=True)
-        #if self.steps_count > 5000: return
+        #if self.steps_count > 100000: return
         new_candidate_sequence = self.generator.generate_candidate_step(candidate_sequence)
         for x in new_candidate_sequence:
             if not self.filter_manager.filter_candidate_step(x):
@@ -44,7 +43,6 @@ class IntersectingPolygons:
 
 n=7
 fm = FilterManager(n, [
-    HappyPathFilter,
     ParityFilter,
     Lemma1Filter,
     MaxFullLengthStepFilter,

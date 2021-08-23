@@ -1,5 +1,5 @@
 from filters import (RepeatedStepFilter, MaxFullLengthStepFilter,
-                    HappyPathFilter, Lemma1Filter, ParityFilter)
+                    Lemma1Filter, ParityFilter)
 
 def test_repeated_step_filter():
     print("testing repeated step filter")
@@ -24,17 +24,6 @@ def test_max_full_length_step_filter():
     assert f.apply_filter([[1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4]])
     assert not f.apply_filter([[1, 2, 3, 4], [1, 2, 3, 4], [2, 3], [1, 2, 3, 4], [1, 2, 3, 4]])
     assert not f.apply_filter([[1, 2], [2, 3], [3, 4], [1, 4], [1, 4]])
-
-def test_happy_path_filter():
-    f = HappyPathFilter(5)
-    assert not f.apply_filter([])
-    assert not f.apply_filter([[1, 2, 3, 4]])
-    assert not f.apply_filter([[1, 2, 3]])
-    assert f.apply_filter([[1, 2]])
-    assert f.apply_filter([[1, 2], [1, 2, 3]])
-    assert f.apply_filter([[1, 2], [2, 3]])
-    assert not f.apply_filter([[1, 2, 3, 4], [2, 3, 4], [1, 2, 3, 5]])
-    assert f.apply_filter([[1, 2, 3, 4], [2, 3, 4], [1, 2, 3, 5], [4, 3, 5]])
 
 def test_lemma_1_filter():
     print("testing Lemma 1 filter")
@@ -64,5 +53,4 @@ def test_parity_filter():
 test_parity_filter()
 test_repeated_step_filter()
 test_max_full_length_step_filter()
-test_happy_path_filter()
 test_lemma_1_filter()

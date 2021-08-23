@@ -145,22 +145,3 @@ class OddLengthStepFilter(IntersectionSequenceFilter):
     def apply_filter(self, candidate_sequence):
         # TODO implement
         return False
-
-class HappyPathFilter(IntersectionSequenceFilter):
-    """
-    filters out sequences that can't violate the premise
-    in particular if the maximum free edges have already been used we can stop the sequence
-    """
-    # TODO probably could have a better name for this filter
-    def __init__(self, n):
-        self.n = n
-        # can have this fewer than this many intersections under full accumulated in a sequence and still
-        #  potentially reach a contradictory example
-        self.max_freedoms = self.n - 3 
-
-    def apply_filter(self, candidate_sequence):
-        if sum([(self.n - 1) - len(step) for step in candidate_sequence]) >= self.max_freedoms:
-            #print(f"filtered for happy path {candidate_sequence}")
-            return True
-        return False
-

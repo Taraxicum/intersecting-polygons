@@ -3,15 +3,27 @@ import itertools
     
 class PolygonIntersectionGenerator:
     def __init__(self, n):
+        assert n%2==1, f"n must be odd, got {n}"
         self.n = n# n is the number of edges of P
+        
+        # TODO max_freedoms is also defined in filters, better if only be defined in one place
+        # allowed freedoms is the total amount that steps are less than full sized and so potentially
+        #   break the conjecture by having two polygons with greater than the proposed number of
+        #   intersections
+        # this conjecture allows for n - 3 so we don't need to check those because they are allowed
+        #   we also don't need to consider n - 4 since that would not lead to a valid polygon since
+        #   it would imply the sequence was currently inside the polygon but with no freedom to
+        #   get back outside
+        self.allowed_freedoms = self.n - 5
+
+    def remaining_freedoms(self, candidate_sequence):
+        return self.allowed_freedoms - sum([(self.n - 1) - len(step) for step in candidate_sequence])
 
     def edges(self):#edges is a list 1,...,n of the edges of P
         return [i + 1 for i in range(self.n)]
 
     def generate_candidate_step(self, candidate_sequence):
         # yield candidate sequence with new element at end
-        # TODO should generalize this better, in particular for larger n will need to
-        #  generate steps that may be missing more than 3 edges
         if not candidate_sequence: # the first term in the sequence is special
             for candidate in self.generate_initial_full_size_step():
                 print(candidate)
@@ -21,12 +33,15 @@ class PolygonIntersectionGenerator:
             # be full sized
             for candidate in self.generate_full_size_steps(candidate_sequence):
                 yield candidate
-        if candidate_sequence:
-            # The initial step can always be full sized step.
-            for candidate in self.generate_step_missing_k_edges(2, candidate_sequence):
-                yield candidate
-            for candidate in self.generate_step_missing_k_edges(3, candidate_sequence):
-                yield candidate
+        
+        if candidate_sequence: 
+        # The initial step can always be full sized step, so only need to do this after
+        #   there is at least one step
+            for num_fewer_edges in range(1, self.remaining_freedoms(candidate_sequence) + 1):
+            # TODO I think this is correct, but would be good to verify with tests
+                for candidate in self.generate_step_missing_k_edges(num_fewer_edges + 1, candidate_sequence):
+                    # num_fewer_edges + 1 since a full sized step is missing 1
+                    yield candidate
 
     def is_outside_polygon(self, candidate_sequence):
         """
