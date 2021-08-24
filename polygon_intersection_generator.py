@@ -25,7 +25,7 @@ class PolygonIntersectionGenerator:
         # yield candidate sequence with new element at end
         if not candidate_sequence: # the first term in the sequence is special
             for candidate in self.generate_initial_full_size_step():
-                print(candidate)
+                #print(candidate)
                 yield candidate
         elif self.is_outside_polygon(candidate_sequence):
             # a sequence that is currently inside the polygon cannot have the next step
@@ -143,6 +143,7 @@ class PolygonIntersectionGenerator:
         missing_edges = set(self.edges()).difference(last_step)
         assert len(missing_edges) == 1
         missing_edge = missing_edges.pop()
+        
         for new_missing_edge in [(missing_edge + 1)%self.n, (missing_edge - 1)%self.n]:
             if new_missing_edge == 0:
                 new_missing_edge = self.n

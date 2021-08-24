@@ -63,53 +63,59 @@ class Lemma1Filter(IntersectionSequenceFilter):
     """
     filter on lemma 1 from paper (TODO probably should update this description)
     """
+    def update_edge_indices(self, index_cache, step, step_index):
+        """
+        """
+        if step_index in index_cache:
+            return #already indexed this step
+        index_cache[step_index] = dict()
+        for ix, edge in enumerate(step):
+            index_cache[step_index][edge] = ix
+
+    def has_too_many_direction_changes(self, index_cache, step_a, step_b, step_b_index):
+        """
+        checks directions changes if step_b is pointing at step_a, more than one direction change is too many
+        """
+        intersection=[edge for edge in step_a if edge in index_cache[step_b_index]]
+        if len(intersection)<4: # can't have more than one direction change with at most 3 edges
+            return False
+        if index_cache[step_b_index][intersection[1]]>index_cache[step_b_index][intersection[0]]:
+            direction=1
+        else:
+            direction=0
+        
+        direction_changes=0
+        for k in range(2,len(intersection)):#go through the edges on step, left-to-right, and check for direction changes on step_b
+            if index_cache[step_b_index][intersection[k]]>index_cache[step_b_index][intersection[k-1]]:
+                new_direction=1
+            else:
+                new_direction=0
+            if new_direction!=direction:
+                direction=new_direction
+                direction_changes+=1
+            if direction_changes>1:
+                return True
+        return False
+
     def apply_filter(self,candidate_sequence):
         """Returns True if step should be filtered out, returns False otherwise
         """
-        k=len(candidate_sequence)
-        if k>2:
-            last_step=candidate_sequence[-1]
-            for i in range(k-2):#If this is run in conjunction with OrderingFilter then we don't need to look at candidate_sequence[k-2] 
-                direction_changes=0
-                too_many_directions=False
-                step=candidate_sequence[i]
-                intersection=[edge for edge in step if edge in last_step]#first suppose that last_step points at step
-                if len(intersection)<4:
-                    break
-                #for edge in step:
-                #    if edge in last_step:
-                if last_step.index(intersection[1])>last_step.index(intersection[0]):
-                    direction=1
-                else:
-                    direction=0
-                for i in range(2,len(intersection)):#go through the edges on step, left-to-right, and check for direction changes on last_step
-                    if last_step.index(intersection[i])>last_step.index(intersection[i-1]):
-                        new_direction=1
-                    else:
-                        new_direction=0
-                    if new_direction!=direction:
-                        direction=new_direction
-                        direction_changes+=1
-                    if direction_changes>1:
-                        too_many_directions=True
-                        break
-                if too_many_directions:
-                    intersection=[edge for edge in last_step if edge in step]#now suppose that step points at last_step
-                    if step.index(intersection[1])>step.index(intersection[0]):
-                        direction=1#1 means right, 0 means left
-                    else: 
-                        direction=0
-                    for i in range(2,len(intersection)):
-                        if step.index(intersection[i])>step.index(intersection[i-1]):
-                            new_direction=1
-                        else:
-                            new_direction=0
-                        if new_direction!=direction:
-                            direction=new_direction
-                            direction_changes+=1
-                        if direction_changes>1:
-                            return True
-   
+        step_count=len(candidate_sequence)
+        if step_count<=2:
+            return False
+
+        last_step=candidate_sequence[-1]
+        last_step_index = step_count-1
+        index_cache = dict()
+        self.update_edge_indices(index_cache, last_step, last_step_index)
+
+        for step_index in range(step_count-2):#If this is run in conjunction with OrderingFilter then we don't need to look at candidate_sequence[step_count-2] 
+            step=candidate_sequence[step_index]
+            self.update_edge_indices(index_cache, step, step_index)
+
+            if self.has_too_many_direction_changes(index_cache, step, last_step, last_step_index): # first suppose last_step points at step
+                #now suppose that step points at last_step
+                return self.has_too_many_direction_changes(index_cache, last_step, step, step_index)
         return False
 
 class RepeatedStepFilter(IntersectionSequenceFilter):
@@ -132,6 +138,7 @@ class MaxFullLengthStepFilter(IntersectionSequenceFilter):
     """
     a sequence should never have more than three consecutive n-1 length steps
     """
+    #TODO move into generator
     def apply_filter(self, candidate_sequence):
         if len(candidate_sequence)>3:
             if all([len(candidate_sequence[-(i+1)])==self.n-1 for i in range(4)]):

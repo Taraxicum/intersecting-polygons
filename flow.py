@@ -25,19 +25,19 @@ class IntersectingPolygons:
 
     def recursion(self, candidate_sequence):
         self.steps_count += 1
-        if self.steps_count %500000 == 0: 
+        if self.steps_count %1000000 == 0: 
             elapsed_time = time.time() - self.start_time
             print(f"Sequence count {self.steps_count}, time {elapsed_time:.1f}, sequence {candidate_sequence}", flush=True)
-        #if self.steps_count > 500000: return
-        new_candidate_sequence = self.generator.generate_candidate_step(candidate_sequence)
-        for x in new_candidate_sequence:
-            if not self.filter_manager.filter_candidate_step(x):
-                if self.end_condition(x):
-                    print(f"theoretically met end condition {x}")
+        #if self.steps_count > 50000: return
+        new_candidate_sequence_generator = self.generator.generate_candidate_step(candidate_sequence)
+        for new_candidate_sequence in new_candidate_sequence_generator:
+            if not self.filter_manager.filter_candidate_step(new_candidate_sequence):
+                if self.end_condition(new_candidate_sequence):
+                    print(f"theoretically met end condition {new_candidate_sequence}")
                 else:
-                    self.recursion(x)
+                    self.recursion(new_candidate_sequence)
             else:
-                #print(f"filtered out {x}")
+                #print(f"filtered out {new_candidate_sequence}")
                 pass
 
 
